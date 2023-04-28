@@ -13,10 +13,15 @@ class Configuration implements ConfigurationInterface
 
         $treeBuilder->getRootNode()
             ->children()
-            ->scalarNode('folder')
-                ->defaultValue('')
-            ->end()
-
+                ->scalarNode('target_folder')
+                    ->defaultValue('')
+                    ->end()
+            ->arrayNode('excluded_routes')
+                ->scalarPrototype()->end()
+                ->end()
+            ->arrayNode('excluded_prefix_routes')
+                ->scalarPrototype()->end()
+                ->end()
             ->end();
 
         return $treeBuilder;
