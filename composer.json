@@ -1,0 +1,22 @@
+{
+    "name": "spontaneit/static-content-bundle",
+    "description": "Generate static pages",
+    "type": "symfony-bundle",
+    "require": {
+        "php": ">=8.0",
+        "symfony/framework-bundle": "^5.4",
+        "symfony/browser-kit": "^5.4"
+    },
+    "autoload": {
+        "psr-4": {
+            "Spontaneit\\StaticContentBundle\\": "src/"
+        }
+    },  
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Nicolas Deboise",
+            "email": "nicolas.deboise@abrizero.fr"
+        }
+    ]
+}

@@ -1,0 +1,14 @@
+services:
+  _defaults:
+    autowire: true      # Automatically injects dependencies in your services.
+    autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+
+
+  Spontaneit\StaticContentBundle\:
+    resource: '../../'
+    exclude:
+      - '../../DependencyInjection/'
+      - '../../Resources/'
+      - '../../Tests/'
+
+  Spontaneit\StaticContentBundle\Service\StaticContentService: ['%static_content.folder%']
