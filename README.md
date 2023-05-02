@@ -1,6 +1,9 @@
 # Static content
 Generate static pages from symfony routes
 
+## Configuration
+Add static_content.yaml file in your config/packages folder
+
 ## Edit htaccess 
 Add this to the /public/.htaccess file to serve static pages automatically:
 

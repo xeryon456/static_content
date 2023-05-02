@@ -19,6 +19,7 @@ class StaticContentService{
     public function cleanFolder(){
         $this->filesystem->remove($this->target_folder);
     }
+
     public function saveStaticRoute($route = []){
         $content = $this->transform($route);
         $this->write($route, $content);
