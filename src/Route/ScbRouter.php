@@ -30,9 +30,11 @@ final class ScbRouter{
         }
         return $routes;
     }
+    
     public function filterNames(string $routeName, array $excluded_routes = []){
         return in_array($routeName, $excluded_routes);
     }
+
     public function filterPrefixes(string $routePath, array $excluded_prefix_routes = []){
         if(!empty($excluded_prefix_routes)){
             foreach ($excluded_prefix_routes as $prefix) {

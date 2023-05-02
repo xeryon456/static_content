@@ -1,15 +1,15 @@
 <?php
 namespace Spontaneit\StaticContentBundle\Command;
 
-use Doctrine\ORM\EntityManagerInterface;
+use Spontaneit\StaticContentBundle\Factory\EntityFactory;
 use Spontaneit\StaticContentBundle\Route\ScbRouter;
+use Spontaneit\StaticContentBundle\Service\PropertiesService;
 use Spontaneit\StaticContentBundle\Service\StaticContentService;
 use Symfony\Component\Console\Attribute\AsCommand;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Style\SymfonyStyle;
-use Symfony\Component\DependencyInjection\ParameterBag\ContainerBagInterface;
 
 #[AsCommand(
     name: 'scb:generate-static-content',
@@ -22,13 +22,13 @@ class GenerateStaticContentCommand extends Command
     private $excluded_routes = [];
     private $excluded_prefix_routes = [];
     public function __construct(
-        private ContainerBagInterface $container, 
+        private PropertiesService $properties_service, 
         private ScbRouter $scb_router,
         private StaticContentService $scb_service,
-        private EntityManagerInterface $em)
+        private EntityFactory $entity_factory)
     {   
-        $this->excluded_routes = $container->get('static_content.excluded_routes');
-        $this->excluded_prefix_routes = $container->get('static_content.excluded_prefix_routes');
+        $this->excluded_routes = $properties_service->getExcludedRoutes();
+        $this->excluded_prefix_routes = $properties_service->getExcludedPrefixRoutes();
         parent::__construct();
     }
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -36,39 +36,30 @@ class GenerateStaticContentCommand extends Command
         $io = new SymfonyStyle($input, $output);
         $io->title('Generate static content from symfony routes');
 
-        //Clean
-        /*public function clean() : void
-        {
-            $this->filesystem->remove($this->outputPathResolver->outputLocation());
-        }*/
+        $this->scb_service->cleanFolder();
 
         $all_routes = $this->scb_router->getRoutes($this->excluded_routes, $this->excluded_prefix_routes);
         if (!\count($all_routes)) {
             $io->note('There are no routes that could be transformed into static content');
             return Command::FAILURE;
         }
-        //$general_progress = $io->createProgressBar(\count($all_routes));
 
         foreach($all_routes as $route){
             $io->writeln('Route: ' . $route['route_name'] . '...');
             if($route['route_parameter'] != null){
-                $parameters = [];
-                $class = "App\Entity\\".ucfirst(explode('_',$route['route_parameter'])[0]);
-                get_class(new $class);
-                $entities = $this->em->getRepository($class)->findAll();
-                
+                $this->entity_factory->setParameter($route);
+                $method = $this->entity_factory->getMethod($route);
+                $entities = $this->entity_factory->getEntities();
                 $progress = $io->createProgressBar(count($entities));
                 foreach($entities as $entity){
-                    $method = 'get'.ucfirst(explode('_',$route['route_parameter'])[1]);
-                    $parameters[$route['route_parameter']] = $entity->$method(); 
-                    $route['slug'] = $entity->$method();
-                    $this->scb_service->saveStaticRoute($route['route_name'], $route['route_path'], $route['slug'], $parameters);
+                    $route['route_slug'] = $entity->$method();
+                    $this->scb_service->saveStaticRoute($route);
                     $progress->advance(1);
                 }
                 $progress->finish();
                 $io->newLine();
             }else{
-                $this->scb_service->saveStaticRoute($route['route_name'], $route['route_path']);
+                $this->scb_service->saveStaticRoute($route);
             }
         }
         $io->success('Static content generated');
