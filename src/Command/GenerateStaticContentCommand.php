@@ -35,7 +35,7 @@ class GenerateStaticContentCommand extends Command
     {
         $io = new SymfonyStyle($input, $output);
         $io->title('Generate static content from symfony routes');
-
+        $io->writeln(bin2hex(random_bytes(20)));
         $this->scb_service->cleanFolder();
 
         $all_routes = $this->scb_router->getRoutes($this->excluded_routes, $this->excluded_prefix_routes);

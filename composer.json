@@ -20,5 +20,13 @@
             "name": "Nicolas Deboise",
             "email": "nicolas.deboise@abrizero.fr"
         }
-    ]
+    ],
+    "extra": {
+        "symfony": {
+            "endpoint": [
+                "https://api.github.com/repos/your-github-account-name/your-recipes-repository/contents/index.json",
+                "flex://defaults"
+            ]
+        }
+    }
 }

@@ -1,0 +1,29 @@
+{
+    "manifests": {
+        "spontaneit/static-content-bundle": {
+            "manifest": {
+                "bundles": {
+                    "Spontaneit\\StaticContentBundle": [
+                        "all"
+                    ]
+                },
+                "copy-from-recipe": {
+                    "config/": "%CONFIG_DIR%"
+                }
+            },
+            "files": {
+                "config/packages/static_content.yaml": {
+                    "contents": [
+                        "static_content:",
+                        "    target_folder: static",
+                        "    excluded_routes: []",
+                        "    excluded_prefix_routes: []",
+                        ""
+                    ],
+                    "executable": false
+                }
+            },
+            "ref": "d49306c0c79a4a0dfeea442216613dd4033a7319"
+        }
+    }
+}
