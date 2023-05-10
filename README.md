@@ -7,8 +7,8 @@ Add static_content.yaml file in your config/packages folder
 ```
 static_content:
   target_folder: static
-  excluded_routes: ['fc_load_events', 'test', 'home', 'app_logout', 'app_login']
-  excluded_prefix_routes: ['ajax', 'admin', 'account', 'assets']
+  excluded_routes: ['app_logout', 'app_login']
+  excluded_prefix_routes: ['ajax', 'admin']
 ```
 
 ## Edit htaccess 
