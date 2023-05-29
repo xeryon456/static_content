@@ -20,6 +20,7 @@ class GenerateStaticContentCommand extends Command
 {
     public const NAME = 'scb:generate-static-content';
     private $excluded_routes = [];
+    private $included_routes = [];
     private $excluded_prefix_routes = [];
     public function __construct(
         private PropertiesService $properties_service, 
@@ -29,6 +30,7 @@ class GenerateStaticContentCommand extends Command
     {   
         $this->excluded_routes = $properties_service->getExcludedRoutes();
         $this->excluded_prefix_routes = $properties_service->getExcludedPrefixRoutes();
+        $this->included_routes = $properties_service->getIncludedRoutes();
         parent::__construct();
     }
     protected function execute(InputInterface $input, OutputInterface $output): int
@@ -38,7 +40,7 @@ class GenerateStaticContentCommand extends Command
         $io->writeln(bin2hex(random_bytes(20)));
         $this->scb_service->cleanFolder();
 
-        $all_routes = $this->scb_router->getRoutes($this->excluded_routes, $this->excluded_prefix_routes);
+        $all_routes = $this->scb_router->getRoutes($this->excluded_routes, $this->excluded_prefix_routes, $this->included_routes);
         if (!\count($all_routes)) {
             $io->note('There are no routes that could be transformed into static content');
             return Command::FAILURE;

@@ -8,29 +8,46 @@ final class ScbRouter{
     public function __construct(private RouterInterface $router_interface)
     {
     }
-    public function getRoutes(array $excluded_routes = [], array $excluded_prefix_routes = []){
+    public function getRoutes(array $excluded_routes = [], array $excluded_prefix_routes = [], array $included_routes = []){
         $routes = [];
         $all_routes = $this->router_interface->getRouteCollection()->all();
         foreach($all_routes as $routeName => $parameters){
-            if (\strncmp($routeName, "_", \strlen("_")) !== 0 
-                && $this->filterNames($routeName, $excluded_routes) === false
-                && $this->filterPrefixes($parameters->getPath(), $excluded_prefix_routes) === false
-            ) {
-                $route_parameter = null;
-                preg_match_all("/({)(.*)(})/", $parameters->getPath(), $matches, PREG_SET_ORDER); 
-                if(!empty($matches)){
-                    $route_parameter = $matches[0][2];
+            if(!empty($included_routes)){
+                if($this->isIncluded($routeName, $included_routes)){
+                    $route_parameter = null;
+                    preg_match_all("/({)(.*)(})/", $parameters->getPath(), $matches, PREG_SET_ORDER); 
+                    if(!empty($matches)){
+                        $route_parameter = $matches[0][2];
+                    }
+                    $routes[] = [
+                        "route_name" => $routeName,
+                        "route_path" => $parameters->getPath(),
+                        "route_parameter" => $route_parameter
+                    ];
                 }
-                $routes[] = [
-                    "route_name" => $routeName,
-                    "route_path" => $parameters->getPath(),
-                    "route_parameter" => $route_parameter
-                ];
+            }else{
+                if (\strncmp($routeName, "_", \strlen("_")) !== 0 
+                    && $this->filterNames($routeName, $excluded_routes) === false
+                    && $this->filterPrefixes($parameters->getPath(), $excluded_prefix_routes) === false
+                ) {
+                    $route_parameter = null;
+                    preg_match_all("/({)(.*)(})/", $parameters->getPath(), $matches, PREG_SET_ORDER); 
+                    if(!empty($matches)){
+                        $route_parameter = $matches[0][2];
+                    }
+                    $routes[] = [
+                        "route_name" => $routeName,
+                        "route_path" => $parameters->getPath(),
+                        "route_parameter" => $route_parameter
+                    ];
+                }
             }
         }
         return $routes;
     }
-    
+    public function isIncluded(string $routeName, array $included_routes = []){
+        return in_array($routeName, $included_routes);
+    }
     public function filterNames(string $routeName, array $excluded_routes = []){
         return in_array($routeName, $excluded_routes);
     }
