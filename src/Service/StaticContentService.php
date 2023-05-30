@@ -20,9 +20,15 @@ class StaticContentService{
         $this->filesystem->remove($this->target_folder);
     }
 
+    public function cleanOldRoute($route = []){
+        $filename = $this->getFileName($route);
+        $this->filesystem->remove(($this->target_folder !== null?$this->target_folder.'/':'').($filename !== null?$filename:'').'.html');
+    }
+
     public function saveStaticRoute($route = []){
         $content = $this->transform($route);
-        $this->write($route, $content);
+        $filename = $this->getFileName($route);
+        $this->write($content, $filename);
         return true;
     }
     private function transform($route){
@@ -46,28 +52,31 @@ class StaticContentService{
         return $content;
     }
 
-    private function write($route = [], $content = false){
-        if($content !== false){
-            $new_folder = null;
-            $ex_path = array_filter(explode("/", $route['route_path']));
-            if(count($ex_path) > 1){
+    private function getFileName($route = []){
+        $filename = null;
+        $ex_path = array_filter(explode("/", $route['route_path']));
+        if(count($ex_path) > 1){
                 foreach($ex_path as $key => $p){
                     if(strstr($p,'{') !== false){
-                        $new_folder.= $route['route_slug'].'/';
+                        $filename.= $route['route_slug'].'/';
                     }else{
-                        $new_folder.= $p;
+                        $filename.= $p;
                         if ($key !== array_key_last($ex_path)) {
-                            $new_folder.='/';
+                            $filename.='/';
                         }
                     }
                 }
-            }else{
-                $new_folder = $ex_path[1];
+        }else{
+                $filename = $ex_path[1];
                 if($route['route_parameter'] !== null){
-                    $new_folder = $route['route_slug'];
+                    $filename = $route['route_slug'];
                 }
-            }
-            $this->filesystem->dumpFile($this->kernel->getProjectDir() . '/public/'.($this->target_folder !== null?$this->target_folder.'/':'').($new_folder !== null?$new_folder:'').'.html' ,$content);
+        }
+        return $filename;
+    }
+    private function write($content = false, $filename = null){
+        if($content !== false){
+            $this->filesystem->dumpFile($this->kernel->getProjectDir() . '/public/'.($this->target_folder !== null?$this->target_folder.'/':'').($filename !== null?$filename:'').'.html' ,$content);
         }
         return true;
     }
