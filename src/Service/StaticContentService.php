@@ -63,6 +63,9 @@ class StaticContentService{
                 }
             }else{
                 $new_folder = $ex_path[1];
+                if($route['route_parameter'] !== null){
+                    $new_folder = $route['route_slug'];
+                }
             }
             $this->filesystem->dumpFile($this->kernel->getProjectDir() . '/public/'.($this->target_folder !== null?$this->target_folder.'/':'').($new_folder !== null?$new_folder:'').'.html' ,$content);
         }

@@ -26,5 +26,5 @@ where static is the default 'target_folder' parameter in config file
 
 ## Doctrine entities
 to generate static pages for doctrine entities with for example a slug attribute,
-you have to name your url like this: 
-    /myentity/{myentity_slug}
+you have to set parameter name like this: 
+    {myentity_slug}
